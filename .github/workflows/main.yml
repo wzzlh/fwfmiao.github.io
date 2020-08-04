@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: pnpm install
+        run: yarn
       - name: Deploy
         id: deploy
         uses: sma11black/hexo-action@v1.0.2
