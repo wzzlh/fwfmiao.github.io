@@ -30,7 +30,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          rm pnpm-lock.lock
+          ls
+          rm **/pnpm-lock.lock
       - name: Install dependencies
         run: pnpm i
       - name: Deploy
