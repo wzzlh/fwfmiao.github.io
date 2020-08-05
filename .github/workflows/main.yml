@@ -23,7 +23,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install Dependencies
-        run: yarn install
+        run: npm install
       - name: Deploy
         id: deploy
         uses: sma11black/hexo-action@v1.0.2
