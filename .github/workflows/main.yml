@@ -30,7 +30,7 @@ jobs:
       - name: Check Cache Hit
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          rm pnpm-lock.yaml
+          rm -f pnpm-lock.yaml
       - name: Install Dependencies
         run: pnpm i
       - name: Deploy
