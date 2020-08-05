@@ -24,14 +24,13 @@ jobs:
         id: yarn-cache
         with:
           path: "~/.pnpm-store"
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/pnpm-lock.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          ls
-          rm **/pnpm-lock.lock
+          rm pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm i
       - name: Deploy
