@@ -15,15 +15,24 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12'
-      - name: Save & Restore Npm Package Cache
+      - name: Setup Pnpm environment
+        uses: pnpm/action-setup@v1.2.0
+        with:
+          version: 4.11.1
+      - name: Cache Dependencies
+        id: pnpm-cache
         uses: actions/cache@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: "~/.pnpm-store"
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-
+      - name: Check Cache Hit
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          rm -f pnpm-lock.yaml
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
       - name: Deploy
         id: deploy
         uses: sma11black/hexo-action@v1.0.2
