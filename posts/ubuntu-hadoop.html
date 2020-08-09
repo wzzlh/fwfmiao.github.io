@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="msvalidate.01" content="B3C8AB35B1F97A3EBC4244FFFA656AE9">
+  <meta name="yandex-verification" content="DT5rdVpWuLkbg2sACQp0zsF3Fv8wTb-HPYijYJprwD8">
+  <meta name="baidu-site-verification" content="yBSgXL4Z57vA68tQ">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"liufengyu.cn","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}},"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="版本 JDK: 8u221 Hadoop: 3.1.2  下载首先点击这里，进入Hadoop官网下载页面。  选择3.0.3版本进行下载，然后点击binary地址进行下载  选中官方推荐的地址即可下载，其他地址也可用（建议采用迅雷等下载工具下载，速度比较会快很多，上传至UBUNTU系统） 或者使用wget命令进行下载 1wget http:&#x2F;&#x2F;mirror.bit.edu.cn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在Ubuntu上安装配置Hadoop">
+<meta property="og:url" content="https://liufengyu.cn/posts/ubuntu-hadoop.html">
+<meta property="og:site_name" content="飞鱼塘">
+<meta property="og:description" content="版本 JDK: 8u221 Hadoop: 3.1.2  下载首先点击这里，进入Hadoop官网下载页面。  选择3.0.3版本进行下载，然后点击binary地址进行下载  选中官方推荐的地址即可下载，其他地址也可用（建议采用迅雷等下载工具下载，速度比较会快很多，上传至UBUNTU系统） 或者使用wget命令进行下载 1wget http:&#x2F;&#x2F;mirror.bit.edu.cn">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/01.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/02.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/03.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C04.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C05.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C06.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C07.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/08.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/09.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/10.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C11.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop%5C12.png">
+<meta property="og:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/13.png">
+<meta property="article:published_time" content="2019-03-05T02:24:42.000Z">
+<meta property="article:modified_time" content="2020-08-09T08:05:49.028Z">
+<meta property="article:author" content="飞木鱼">
+<meta property="article:tag" content="Ubuntu">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://liufengyu.cn/posts/ubuntu-hadoop/01.png">
+
+<link rel="canonical" href="https://liufengyu.cn/posts/ubuntu-hadoop.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何在Ubuntu上安装配置Hadoop | 飞鱼塘</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飞鱼塘</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">飞木鱼的个人博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">16</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">1</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://liufengyu.cn/posts/ubuntu-hadoop.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="飞木鱼">
+      <meta itemprop="description" content="整理一些值得留意的文章">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飞鱼塘">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何在Ubuntu上安装配置Hadoop
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-05 10:24:42" itemprop="dateCreated datePublished" datetime="2019-03-05T10:24:42+08:00">2019-03-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-09 16:05:49" itemprop="dateModified" datetime="2020-08-09T16:05:49+08:00">2020-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%99%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">教程</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/posts/ubuntu-hadoop.html#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="/posts/ubuntu-hadoop.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h1><ul>
+<li>JDK: 8u221</li>
+<li>Hadoop: 3.1.2</li>
+</ul>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>首先<span class="exturl" data-url="aHR0cHM6Ly9oYWRvb3AuYXBhY2hlLm9yZy9yZWxlYXNlcy5odG1s">点击这里<i class="fa fa-external-link-alt"></i></span>，进入Hadoop官网下载页面。</p>
+<p><img data-src="ubuntu-hadoop/01.png" alt="Hadoop下载页面"></p>
+<p>选择3.0.3版本进行下载，然后点击binary地址进行下载</p>
+<p><img data-src="ubuntu-hadoop/02.png" alt="Hadoop镜像选择页面"></p>
+<p>选中官方推荐的地址即可下载，其他地址也可用（建议采用迅雷等下载工具下载，速度比较会快很多，上传至UBUNTU系统）</p>
+<p>或者使用<code>wget</code>命令进行下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http:&#x2F;&#x2F;mirror.bit.edu.cn&#x2F;apache&#x2F;hadoop&#x2F;common&#x2F;hadoop-3.1.2&#x2F;hadoop-3.1.2.tar.gz</span><br></pre></td></tr></table></figure>
+
+<h1 id="HOSTS"><a href="#HOSTS" class="headerlink" title="HOSTS"></a>HOSTS</h1><p>Hosts是一个没有扩展名的系统文件，可以用记事本等工具打开，其作用就是将一些常用的网址域名与其对应的IP地址建立一个关联“数据库”，当用户在浏览器中输入一个需要登录的网址时，系统会首先自动从Hosts文件中寻找对应的IP地址，一旦找到，系统会立即打开对应网页，如果没有找到，则系统会再将网址提交DNS域名解析服务器进行IP地址的解析。</p>
+<p>为了机器能够快速识别自己以及其他机器，我们可以做一下域名和IP的hosts映射，这样在之后的操作中，我们就可以直接用域名来代替IP地址</p>
+<h2 id="伪分布模式"><a href="#伪分布模式" class="headerlink" title="伪分布模式"></a>伪分布模式</h2><p>使用<code>vi /etc/hosts</code>命令添加master映射，并修改localhost</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">本机IP localhost</span><br><span class="line">本机IP master</span><br></pre></td></tr></table></figure>
+
+<h2 id="全分布模式"><a href="#全分布模式" class="headerlink" title="全分布模式"></a>全分布模式</h2><p>全分布模式下，需要你在每一台机器都设置好hosts，例如我有三台机器，IP分别为<code>192.168.0.1</code> <code>192.168.0.2</code> <code>192.168.0.3</code>，那么master主节点机器的hosts内容就如下进行设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">192.168.0.1 localhost</span><br><span class="line"></span><br><span class="line">192.168.0.1 master</span><br><span class="line">192.168.0.2 slave1</span><br><span class="line">192.168.0.3 slave1</span><br></pre></td></tr></table></figure>
+
+<p>方便计算机互相连接</p>
+<h1 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SSH 为 Secure Shell 的缩写，由 IETF 的网络小组（Network Working Group）所制定；SSH 为建立在应用层基础上的安全协议。SSH 是目前较可靠，专为远程登录会话和其他网络服务提供安全性的协议。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>Ubuntu中一般默认安装了ssh，如果没有安装，可以使用下面的命令进行安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install openssh-server</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="ubuntu-hadoop/03.png" alt="SSH安装"></p>
+<p>由于我的Ubuntu服务器已经安装好了SSH，所以提示我无需安装。安装好后，我们需要启动一下SSH服务。</p>
+<h2 id="查看并启动SSH"><a href="#查看并启动SSH" class="headerlink" title="查看并启动SSH"></a>查看并启动SSH</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ps -e | grep ssh</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>ps -e</code>表示查看当前的进程，-e表示显示全部，效果同-A<br><code>grep ssh</code>即<code>grep match_pattern</code>，是正则表达式，它会获取包含<strong>match_pattern</strong>的文本段</p>
+<p><img data-src="ubuntu-hadoop%5C04.png" alt="查看ssh服务"></p>
+<p>当有类似如上结果显示时，表示服务器的SSH服务正在运行中。如果没有则需要<strong>启动SSH</strong>服务，可以运行下面的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service ssh start</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service ssh restart</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看并修改SSH设置"><a href="#查看并修改SSH设置" class="headerlink" title="查看并修改SSH设置"></a>查看并修改SSH设置</h2><p>SSH的配置文件一般在<code>/etc/ssh/sshd_config</code>中</p>
+<p>可以使用下面的命令编辑，或者使用<code>gedit</code>编辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;ssh&#x2F;sshd_config</span><br></pre></td></tr></table></figure>
+
+<p>老版本的话，可能需要做如下修改才行。如果有<code>PermitRootLogin without-password</code>,加一个”#”号，注释掉该行，并增加一句<code>PermitRootLogin yes</code></p>
+<h2 id="生成密钥对"><a href="#生成密钥对" class="headerlink" title="生成密钥对"></a>生成密钥对</h2><p>使用下面的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen  -t rsa</span><br></pre></td></tr></table></figure>
+
+<p>该命令将在~/.ssh目录下面产生一个密钥id_rsa和一个公钥id_rsa.pub<br>将你的计算机(A)中的公钥传给别的计算机(B)，你才能免密码登录到计算机B</p>
+<h2 id="免密登录本机"><a href="#免密登录本机" class="headerlink" title="免密登录本机"></a>免密登录本机</h2><p>首先使用下面的命令，将公钥发放给自己</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp ~&#x2F;.ssh&#x2F;id_rsa.pub ~&#x2F;.ssh&#x2F;authorized_keys</span><br></pre></td></tr></table></figure>
+
+<p>你可以进入<code>~/.ssh/</code>路径下，更方便的进行操作</p>
+<p>需要查看<code>authorized_keys</code>文件的权限，需要保证是600,</p>
+<p>如果权限不正确，请使用下面的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 600 authorized_keys</span><br></pre></td></tr></table></figure>
+
+<p>然后使用下面的命令，免密连接本机</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh localhost</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="ubuntu-hadoop%5C05.png" alt="ssh免密登录"></p>
+<p>当有类似结果如上图所示，表示你已经可以成功免密登录了</p>
+<h2 id="全分布模式-免密登录到别的计算机）"><a href="#全分布模式-免密登录到别的计算机）" class="headerlink" title="全分布模式(免密登录到别的计算机）"></a>全分布模式(免密登录到别的计算机）</h2><p>如果你需要登录到别的计算机，你需要将<code>id_rsa.pub</code>发送给别的电脑同样的路径，保存到<code>authorized_keys</code>文件中，如果对方计算机也要免密登录到你的计算机，也需要将它的<code>id_rsa.pub</code>发送到你的电脑同样的路径，保存到<code>authorized_keys</code>文件中</p>
+<p>如果是多个计算机，比如三个（master slave1 slave2）,最方便的方法就是，每台计算机先运行<code>ssh-keygen  -t rsa</code>生成<code>id_rsa.pub</code>文件，然后创建一个记事本，将3个<code>id_rsa.pub</code>文件中的内容都保存起来，然后重命名为<code>authorized_keys</code>，然后使用下面<code>scp</code>命令，直接发放给每台计算机，发放时需要输入每天计算机密码，设置完毕后，再进行传输就不需要了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scp ~&#x2F;.ssh&#x2F;authorized_keys slave1:~&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line">scp ~&#x2F;.ssh&#x2F;authorized_keys slave2:~&#x2F;.ssh&#x2F;authorized_keys</span><br></pre></td></tr></table></figure>
+
+<p><strong>记得检查权限</strong></p>
+<h1 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h1><p>下载完毕后，使用下面的命令，将hadoop解压出来，并移动到合适的位置，我解压到了<code>/opt</code>目录下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf .&#x2F;hadoop-3.1.2.tar.gz -C &#x2F;opt</span><br></pre></td></tr></table></figure>
+
+<p>之后，需要配置以下的环境变量</p>
+<p>使用vi命令编辑<code>vi /etc/profile</code>，添加下面的环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># HADOOP</span><br><span class="line">export HADOOP_HOME&#x3D;&#x2F;opt&#x2F;hadoop-3.1.2</span><br><span class="line">export HADOOP_CONF_DIR&#x3D;$&#123;HADOOP_HOME&#125;&#x2F;etc&#x2F;hadoop</span><br><span class="line">export PATH&#x3D;$&#123;HADOOP_HOME&#125;&#x2F;bin:$&#123;HADOOP_HOME&#125;&#x2F;sbin:$PATH</span><br></pre></td></tr></table></figure>
+
+<p>添加完毕保存后，使用<code>source /etc/profile</code>更新环境变量</p>
+<p>更新环境变量后，可以命令<code>hdfs</code>来检查环境变量是否配置成功</p>
+<p><img data-src="ubuntu-hadoop%5C06.png" alt="hdfs检查"></p>
+<p>当有类似的命令提示如上图所示，表示你已经成功配置好环境变量了</p>
+<h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p>hadoop的部署分为3种模式，分别为<strong>单机模式</strong> <strong>伪分布模式(单节点)</strong> <strong>全分布模式</strong>三种</p>
+<p>无论部署哪种模式，我们都需要先配置环境变量，我们选择配置系统变量，无论是否是当前路径都可以使用</p>
+<h2 id="单机模式"><a href="#单机模式" class="headerlink" title="单机模式"></a>单机模式</h2><p>如果你只是进行单节点运行，那么你现在已经完成安装了，不需要启动，可以直接进入测试环节</p>
+<h2 id="伪分布模式-1"><a href="#伪分布模式-1" class="headerlink" title="伪分布模式"></a>伪分布模式</h2><p>首先打开<code>/opt/hadoop-3.2.0/etc/hadoop</code>这个目录，分别编辑下面几个文件，根据个人需求更改参数：</p>
+<h3 id="core-site-xml"><a href="#core-site-xml" class="headerlink" title="core-site.xml"></a>core-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 配置hdfs的namenode的地址，使用的是hdfs协议</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 配置hadoop运行时产生数据的存储目录，不是临时目录</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;tmp&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>master在hosts文件中做了映射，可以替换成本机IP</p>
+<p>hadoop有时候并不能自己创建namenode和datanode文件夹，可以运行下面的命令手动创建这2个文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p &#x2F;opt&#x2F;data&#x2F;namenode</span><br><span class="line">mkdir -p &#x2F;opt&#x2F;data&#x2F;datanode</span><br><span class="line">mkdir -p &#x2F;opt&#x2F;tmp</span><br></pre></td></tr></table></figure>
+
+<h3 id="hdfs-site-xml"><a href="#hdfs-site-xml" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 配置在hdfs中，一份文件存几份，默认是3份，一台机器只能存一份，伪分布设置为1</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;1&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 是否打开权限检查系统</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.permissions&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;false&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 命名空间和事务在本地文件系统永久存储的路径</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.namenode.name.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;data&#x2F;namenode&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # DataNode在本地文件系统中存放块的路径</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.datanode.data.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;data&#x2F;datanode&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="yarn-site-xml"><a href="#yarn-site-xml" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 指定yarn的resourcemanager的地址（该地址是resourcemanager的主机地址，即主机名或该主机的ip地址）</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.resourcemanager.hostname&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;master&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 指定mapreduce执行shuffle时获取数据的方式</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="mapred-site-xml"><a href="#mapred-site-xml" class="headerlink" title="mapred-site.xml"></a>mapred-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 指定mapreduce运行在yarn上</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;yarn&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.app.mapreduce.am.env&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;opt&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;mapreduce.map.env&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;opt&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;mapreduce.reduce.env&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;HADOOP_MAPRED_HOME&#x3D;&#x2F;opt&#x2F;hadoop-3.1.2&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="hadoop-env-sh"><a href="#hadoop-env-sh" class="headerlink" title="hadoop-env.sh"></a>hadoop-env.sh</h3><p>在任意地方添加JAVA_HOME</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME&#x3D;你的JDK安装地址</span><br></pre></td></tr></table></figure>
+
+<p>所有配置文件修改完毕后，进入hadoop初始化步骤</p>
+<h2 id="全分布模式-1"><a href="#全分布模式-1" class="headerlink" title="全分布模式"></a>全分布模式</h2><p>首先打开<code>/opt/hadoop-3.2.0/etc/hadoop</code>这个目录，分别编辑下面几个文件，根据个人需求更改参数：</p>
+<h3 id="core-site-xml-1"><a href="#core-site-xml-1" class="headerlink" title="core-site.xml"></a>core-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 配置hdfs的namenode的地址，使用的是hdfs协议</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 配置hadoop运行时产生数据的存储目录，不是临时目录</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;tmp&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>master在hosts文件中做了映射，可以替换成本机IP</p>
+<p>hadoop有时候并不能自己创建namenode和datanode文件夹，可以运行下面的命令手动创建这2个文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p &#x2F;opt&#x2F;data&#x2F;namenode</span><br><span class="line">mkdir -p &#x2F;opt&#x2F;data&#x2F;datanode</span><br><span class="line">mkdir -p &#x2F;opt&#x2F;tmp</span><br></pre></td></tr></table></figure>
+
+<h3 id="hdfs-site-xml-1"><a href="#hdfs-site-xml-1" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 配置在hdfs中，一份文件存几份，默认是3份，一台机器只能存一份，小于datanode数量</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;3&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 是否打开权限检查系统</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.permissions&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;false&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 命名空间和事务在本地文件系统永久存储的路径</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.namenode.name.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;data&#x2F;namenode&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # DataNode在本地文件系统中存放块的路径</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;dfs.datanode.data.dir&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;&#x2F;opt&#x2F;data&#x2F;datanode&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果你只有3个datanode，但是你却指定副本数为4，是不会生效的，因为每个datanode上只能存放一个副本。</p>
+<h3 id="yarn-site-xml-1"><a href="#yarn-site-xml-1" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 指定yarn的resourcemanager的地址（该地址是resourcemanager的主机地址，即主机名或该主机的ip地址）</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.resourcemanager.hostname&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;master&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">  # 指定mapreduce执行shuffle时获取数据的方式</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="mapred-site-xml-1"><a href="#mapred-site-xml-1" class="headerlink" title="mapred-site.xml"></a>mapred-site.xml</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  # 指定mapreduce运行在yarn上</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;</span><br><span class="line">    &lt;value&gt;yarn&lt;&#x2F;value&gt;</span><br><span class="line">  &lt;&#x2F;property&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="workers"><a href="#workers" class="headerlink" title="workers"></a>workers</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">master</span><br><span class="line">slave1</span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
+
+<p>老版本文件名为slaves，配置的是所有的从节点，用IP也可以，所有配置文件修改完毕后，进入hadoop初始化步骤</p>
+<h1 id="Hadoop初始化"><a href="#Hadoop初始化" class="headerlink" title="Hadoop初始化"></a>Hadoop初始化</h1><h2 id="允许root账户运行"><a href="#允许root账户运行" class="headerlink" title="允许root账户运行"></a>允许root账户运行</h2><p>使用下面的命令进入hadoop脚本路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd $HADOOP_HOME&#x2F;sbin&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>vi</code>编辑<code>start-dfs.sh</code>和<code>stop-dfs.sh</code>添加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HDFS_DATANODE_USER&#x3D;root </span><br><span class="line">HDFS_DATANODE_SECURE_USER&#x3D;hdfs </span><br><span class="line">HDFS_NAMENODE_USER&#x3D;root </span><br><span class="line">HDFS_SECONDARYNAMENODE_USER&#x3D;root</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>vi</code>编辑<code>start-yarn.sh</code>和<code>stop-yarn.sh</code>添加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">YARN_RESOURCEMANAGER_USER&#x3D;root</span><br><span class="line">HADOOP_SECURE_DN_USER&#x3D;yarn</span><br><span class="line">YARN_NODEMANAGER_USER&#x3D;root</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>vi</code>编辑<code>hadoop-env.sh</code></p>
+<h2 id="hdfs初始化"><a href="#hdfs初始化" class="headerlink" title="hdfs初始化"></a>hdfs初始化</h2><h3 id="伪分布模式-2"><a href="#伪分布模式-2" class="headerlink" title="伪分布模式"></a>伪分布模式</h3><p>然后使用下面的命令初始化hdfs</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs namenode -format</span><br></pre></td></tr></table></figure>
+<p><img data-src="ubuntu-hadoop%5C07.png" alt="hdfs检查"></p>
+<p>格式化完毕后，如图所示，则表示初始化成功，如果初始化失败，需要用下面的命令手动清空namenode和datanode文件夹，调整配置后，重新初始化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rm -rf &#x2F;opt&#x2F;data&#x2F;namenode&#x2F;*</span><br><span class="line">rm -rf &#x2F;opt&#x2F;data&#x2F;datanode&#x2F;*</span><br></pre></td></tr></table></figure>
+
+<h3 id="全分布模式-2"><a href="#全分布模式-2" class="headerlink" title="全分布模式"></a>全分布模式</h3><p>集群模式下，不能能只在主机进行hdfs初始化，还需要到每一台机子中运行下面的命令进行hdfs初始化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs namenode -format</span><br></pre></td></tr></table></figure>
+
+<h1 id="启动Hadoop"><a href="#启动Hadoop" class="headerlink" title="启动Hadoop"></a>启动Hadoop</h1><h2 id="伪分布模式-3"><a href="#伪分布模式-3" class="headerlink" title="伪分布模式"></a>伪分布模式</h2><p>初始化完毕后，我们就可以使用下面的命令启动hadoop了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">start-yarn.sh &amp; start-dfs.sh</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="ubuntu-hadoop/08.png" alt="JPS"></p>
+<p>启动完毕后可以使用<code>jps</code>命令查看启动的hadoop进程</p>
+<p><img data-src="ubuntu-hadoop/09.png" alt="hadoop运行图"></p>
+<p>可以访问 <span class="exturl" data-url="aHR0cDovL21hc3Rlcjo4MDg4Lw==">http://master:8088<i class="fa fa-external-link-alt"></i></span> 查看所有任务的运行情况</p>
+<p><img data-src="ubuntu-hadoop/10.png" alt="hadoop运行图"></p>
+<p>可以访问 <span class="exturl" data-url="aHR0cDovL21hc3Rlcjo5ODcwLw==">http://master:9870<i class="fa fa-external-link-alt"></i></span> 查看Hadoop集群运行情况</p>
+<p>至此整个hadoop就搭建好了</p>
+<h2 id="全分部模式"><a href="#全分部模式" class="headerlink" title="全分部模式"></a>全分部模式</h2><h3 id="Namenode"><a href="#Namenode" class="headerlink" title="Namenode"></a>Namenode</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hdfs --daemon start namenode</span><br><span class="line">hdfs --daemon stop namenode</span><br><span class="line">hdfs --daemon restart namenode</span><br></pre></td></tr></table></figure>
+
+<h3 id="Datanode"><a href="#Datanode" class="headerlink" title="Datanode"></a>Datanode</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hdfs --daemon start datanode</span><br><span class="line">hdfs --daemon stop datanode</span><br><span class="line">hdfs --daemon restart datanode</span><br></pre></td></tr></table></figure>
+
+<p>你可以使用上面的命令挨个启动namenode和datanode，如果已配置好workers和ssh免密登录，你可以使用下面的命令调用脚本直接启动所有hdfs进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">start-dfs.sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="ResourceManager"><a href="#ResourceManager" class="headerlink" title="ResourceManager"></a>ResourceManager</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn --daemon start resourcemanager</span><br><span class="line">yarn --daemon stop resourcemanager</span><br><span class="line">yarn --daemon restart resourcemanager</span><br></pre></td></tr></table></figure>
+
+<h3 id="NodeManager"><a href="#NodeManager" class="headerlink" title="NodeManager"></a>NodeManager</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn --daemon start nodemanager</span><br><span class="line">yarn --daemon stop nodemanager</span><br><span class="line">yarn --daemon restart nodemanager</span><br></pre></td></tr></table></figure>
+
+<p>你可以使用上面的命令挨个启动resourcemanager和nodemanager，如果已配置好workers和ssh免密登录，你可以使用下面的命令调用脚本直接启动所有yarn进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">start-yarn.sh</span><br></pre></td></tr></table></figure>
+
+<h1 id="案例测试"><a href="#案例测试" class="headerlink" title="案例测试"></a>案例测试</h1><h2 id="词频统计"><a href="#词频统计" class="headerlink" title="词频统计"></a>词频统计</h2><p>可以使用下面的命令进行一个wordcount的测试程序(命令已进行版本兼容，不需要修改直接运行即可)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir input</span><br><span class="line">cp $HADOOP_HOME&#x2F;*.txt input</span><br><span class="line">hadoop jar $HADOOP_HOME&#x2F;share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-*.jar wordcount input output</span><br></pre></td></tr></table></figure>
+
+<p>之后通过<code>ls</code>查看当前目录下的文件</p>
+<p><img data-src="ubuntu-hadoop%5C11.png" alt="单机模式测试结果"></p>
+<p>使用下面的命令可查看词频统计的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat output&#x2F;part-r-00000</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="ubuntu-hadoop%5C12.png" alt="单机模式词频统计结果"></p>
+<p>当有类似的结果如上图所示，表示你已经成功搭建好了hadoop单机模式，并测试成功</p>
+<h2 id="PI值计算"><a href="#PI值计算" class="headerlink" title="PI值计算"></a>PI值计算</h2><p>我们可以使用一个简单的例子来测试一下hadoop是否能够正常运行</p>
+<p>我们从hadoop安装文件夹，启动一个终端，使用下面的命令，计算pi值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar $HADOOP_HOME&#x2F;share&#x2F;hadoop&#x2F;mapreduce&#x2F;hadoop-mapreduce-examples-*.jar pi 10 10</span><br></pre></td></tr></table></figure>
+<p><img data-src="ubuntu-hadoop/13.png" alt="hadoop pi值计算"></p>
+<p>如图所示，我们计算量比较少导致不够精确，但是已经可以成功运算出pi值了</p>
+<h1 id="附件"><a href="#附件" class="headerlink" title="附件"></a>附件</h1><p>各配置文件参数描述</p>
+<h2 id="core-site-xml-2"><a href="#core-site-xml-2" class="headerlink" title="core-site.xml"></a>core-site.xml</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th align="center">属性值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fs.defaultFS</td>
+<td align="center">hdfs://localhost:9000</td>
+<td>配置hdfs的namenode的地址，使用的是hdfs协议</td>
+</tr>
+<tr>
+<td>hadoop.tmp.dir</td>
+<td align="center"></td>
+<td>配置hadoop运行时产生数据的存储目录</td>
+</tr>
+<tr>
+<td>io.file.buffer.size</td>
+<td align="center">65536</td>
+<td>配置读/写缓存区的大小，以byte为单位，默认值是4KB</td>
+</tr>
+<tr>
+<td>一般情况下，可以设置为64KB（65536byte）</td>
+<td align="center"></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="hdfs-site-xml-2"><a href="#hdfs-site-xml-2" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>属性值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dfs.replication</td>
+<td>1</td>
+<td>分片数量，伪分布式将其配置成1即可</td>
+</tr>
+<tr>
+<td>dfs.permissions</td>
+<td>false</td>
+<td>是否打开权限检查系统</td>
+</tr>
+<tr>
+<td>dfs.namenode.name.dir</td>
+<td>/opt/data/namenode</td>
+<td>命名空间和事务在本地文件系统永久存储的路径</td>
+</tr>
+<tr>
+<td>dfs.datanode.data.dir</td>
+<td>/opt/data/datanode</td>
+<td>DataNode在本地文件系统中存放块的路径</td>
+</tr>
+</tbody></table>
+<h2 id="yarn-site-xml-2"><a href="#yarn-site-xml-2" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>属性值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>yarn.nodemanager.aux-services</td>
+<td>mapreduce_shuffle</td>
+<td>NodeManager上运行的附属服务。需配置成mapreduce_shuffle，才可运行MapReduce程序</td>
+</tr>
+<tr>
+<td>yarn.nodemanager.auxservices.mapreduce.shuffle.class</td>
+<td>org.apache.hadoop.mapred.ShuffleHandler</td>
+<td>是否打开权限检查系统</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.address</td>
+<td>${yarn.resourcemanager.hostname}:8032</td>
+<td>ResourceManager 对客户端暴露的地址。客户端通过该地址向RM提交应用程序，杀死应用程序等</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.scheduler.address</td>
+<td>${yarn.resourcemanager.hostname}:8030</td>
+<td>ResourceManager对ApplicationMaster暴露的访问地址。ApplicationMaster通过该地址向RM申请资源、释放资源等。</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.resource-tracker.address</td>
+<td>${yarn.resourcemanager.hostname}:8031</td>
+<td>ResourceManager 对NodeManager暴露的地址.。NodeManager通过该地址向RM汇报心跳，领取任务等</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.admin.address</td>
+<td>${yarn.resourcemanager.hostname}:8033</td>
+<td>ResourceManager 对管理员暴露的访问地址。管理员通过该地址向RM发送管理命令等</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.webapp.address</td>
+<td>${yarn.resourcemanager.hostname}:8088</td>
+<td>ResourceManager对外web ui地址。用户可通过该地址在浏览器中查看集群各类信息</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.scheduler.class</td>
+<td>org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler</td>
+<td>启用的资源调度器主类。目前可用的有FIFO、Capacity Scheduler和Fair Scheduler</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.resource-tracker.client.thread-count</td>
+<td>50</td>
+<td>处理来自NodeManager的RPC请求的Handler数目</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.scheduler.client.thread-count</td>
+<td>50</td>
+<td>处理来自ApplicationMaster的RPC请求的Handler数目</td>
+</tr>
+<tr>
+<td>yarn.scheduler.minimum-allocation-mb/yarn.scheduler.maximum-allocation-mb</td>
+<td>1024/8192</td>
+<td>单个可申请的最小/最大内存资源量。比如设置为1024和3072，则运行MapRedce作业时，每个Task最少可申请1024MB内存，最多可申请3072MB内存</td>
+</tr>
+<tr>
+<td>yarn.scheduler.minimum-allocation-vcores/yarn.scheduler.maximum-allocation-vcores</td>
+<td>1/32</td>
+<td>单个可申请的最小/最大虚拟CPU个数。比如设置为1和4，则运行MapRedce作业时，每个Task最少可申请1个虚拟CPU，最多可申请4个虚拟CPU</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.nodes.include-path/yarn.resourcemanager.nodes.exclude-path</td>
+<td></td>
+<td>NodeManager黑白名单。如果发现若干个NodeManager存在问题，比如故障率很高，任务运行失败率高，则可以将之加入黑名单中。注意，这两个配置参数可以动态生效</td>
+</tr>
+<tr>
+<td>yarn.resourcemanager.nodemanagers.heartbeat-interval-ms</td>
+<td>1000</td>
+<td>NodeManager心跳间隔</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>飞木鱼
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://liufengyu.cn/posts/ubuntu-hadoop.html" title="如何在Ubuntu上安装配置Hadoop">https://liufengyu.cn/posts/ubuntu-hadoop.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/ubuntu/" rel="tag"><i class="fa fa-tag"></i> Ubuntu</a>
+              <a href="/tags/spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/windows-spark.html" rel="prev" title="如何在Windows上安装配置Spark">
+      <i class="fa fa-chevron-left"></i> 如何在Windows上安装配置Spark
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/ubuntu-spark.html" rel="next" title="如何在Ubuntu上安装配置Spark">
+      如何在Ubuntu上安装配置Spark <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%88%E6%9C%AC"><span class="nav-number">1.</span> <span class="nav-text">版本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HOSTS"><span class="nav-number">3.</span> <span class="nav-text">HOSTS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%AA%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">伪分布模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">全分布模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH"><span class="nav-number">4.</span> <span class="nav-text">SSH</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">4.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">4.2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%B9%B6%E5%90%AF%E5%8A%A8SSH"><span class="nav-number">4.3.</span> <span class="nav-text">查看并启动SSH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%B9%B6%E4%BF%AE%E6%94%B9SSH%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.4.</span> <span class="nav-text">查看并修改SSH设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%AF%86%E9%92%A5%E5%AF%B9"><span class="nav-number">4.5.</span> <span class="nav-text">生成密钥对</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E6%9C%AC%E6%9C%BA"><span class="nav-number">4.6.</span> <span class="nav-text">免密登录本机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E5%88%B0%E5%88%AB%E7%9A%84%E8%AE%A1%E7%AE%97%E6%9C%BA%EF%BC%89"><span class="nav-number">4.7.</span> <span class="nav-text">全分布模式(免密登录到别的计算机）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2"><span class="nav-number">6.</span> <span class="nav-text">部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E6%A8%A1%E5%BC%8F"><span class="nav-number">6.1.</span> <span class="nav-text">单机模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%AA%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-1"><span class="nav-number">6.2.</span> <span class="nav-text">伪分布模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#core-site-xml"><span class="nav-number">6.2.1.</span> <span class="nav-text">core-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hdfs-site-xml"><span class="nav-number">6.2.2.</span> <span class="nav-text">hdfs-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yarn-site-xml"><span class="nav-number">6.2.3.</span> <span class="nav-text">yarn-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mapred-site-xml"><span class="nav-number">6.2.4.</span> <span class="nav-text">mapred-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hadoop-env-sh"><span class="nav-number">6.2.5.</span> <span class="nav-text">hadoop-env.sh</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-1"><span class="nav-number">6.3.</span> <span class="nav-text">全分布模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#core-site-xml-1"><span class="nav-number">6.3.1.</span> <span class="nav-text">core-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hdfs-site-xml-1"><span class="nav-number">6.3.2.</span> <span class="nav-text">hdfs-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yarn-site-xml-1"><span class="nav-number">6.3.3.</span> <span class="nav-text">yarn-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mapred-site-xml-1"><span class="nav-number">6.3.4.</span> <span class="nav-text">mapred-site.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#workers"><span class="nav-number">6.3.5.</span> <span class="nav-text">workers</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hadoop%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">7.</span> <span class="nav-text">Hadoop初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%81%E8%AE%B8root%E8%B4%A6%E6%88%B7%E8%BF%90%E8%A1%8C"><span class="nav-number">7.1.</span> <span class="nav-text">允许root账户运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hdfs%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">7.2.</span> <span class="nav-text">hdfs初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-2"><span class="nav-number">7.2.1.</span> <span class="nav-text">伪分布模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-2"><span class="nav-number">7.2.2.</span> <span class="nav-text">全分布模式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8Hadoop"><span class="nav-number">8.</span> <span class="nav-text">启动Hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%AA%E5%88%86%E5%B8%83%E6%A8%A1%E5%BC%8F-3"><span class="nav-number">8.1.</span> <span class="nav-text">伪分布模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%88%86%E9%83%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">8.2.</span> <span class="nav-text">全分部模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Namenode"><span class="nav-number">8.2.1.</span> <span class="nav-text">Namenode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Datanode"><span class="nav-number">8.2.2.</span> <span class="nav-text">Datanode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ResourceManager"><span class="nav-number">8.2.3.</span> <span class="nav-text">ResourceManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NodeManager"><span class="nav-number">8.2.4.</span> <span class="nav-text">NodeManager</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E6%B5%8B%E8%AF%95"><span class="nav-number">9.</span> <span class="nav-text">案例测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E9%A2%91%E7%BB%9F%E8%AE%A1"><span class="nav-number">9.1.</span> <span class="nav-text">词频统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PI%E5%80%BC%E8%AE%A1%E7%AE%97"><span class="nav-number">9.2.</span> <span class="nav-text">PI值计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E4%BB%B6"><span class="nav-number">10.</span> <span class="nav-text">附件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#core-site-xml-2"><span class="nav-number">10.1.</span> <span class="nav-text">core-site.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hdfs-site-xml-2"><span class="nav-number">10.2.</span> <span class="nav-text">hdfs-site.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yarn-site-xml-2"><span class="nav-number">10.3.</span> <span class="nav-text">yarn-site.xml</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="飞木鱼"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">飞木鱼</p>
+  <div class="site-description" itemprop="description">整理一些值得留意的文章</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2Z3Zm1pYW8=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fwfmiao"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmxpdS1mZW5neXVAb3V0bG9vay5jb20=" title="E-Mail → mailto:liu-fengyu@outlook.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tLw==" title="https:&#x2F;&#x2F;github.com&#x2F;">Github</span>
+        </li>
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly93d3d3LmJpbGliaWxpLmNvbS8=" title="https:&#x2F;&#x2F;wwww.bilibili.com&#x2F;">Bilibili</span>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">飞木鱼</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">92k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:24</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+  <script data-pjax>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+<script data-pjax>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lfyfzy.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://liufengyu.cn/posts/ubuntu-hadoop.html";
+    this.page.identifier = "/posts/ubuntu-hadoop.html";
+    this.page.title = "如何在Ubuntu上安装配置Hadoop";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://lfyfzy.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+    </div>
+</body>
+</html>

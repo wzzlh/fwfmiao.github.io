@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="msvalidate.01" content="B3C8AB35B1F97A3EBC4244FFFA656AE9">
+  <meta name="yandex-verification" content="DT5rdVpWuLkbg2sACQp0zsF3Fv8wTb-HPYijYJprwD8">
+  <meta name="baidu-site-verification" content="yBSgXL4Z57vA68tQ">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"liufengyu.cn","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}},"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="序这套流程主要是为了记录我在学习以及模型训练的过程，以及其中遇见的相关问题 环境 CPU: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz MEM: 384GB 2400 DDR4 GPU: Matrox Electronics Systems Ltd. G200eR2 DISK: 1.1 TB System: Ubuntu 18.04 LTS Python:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Tensorflow进行物品预测">
+<meta property="og:url" content="https://liufengyu.cn/posts/tensorflow-object-detection.html">
+<meta property="og:site_name" content="飞鱼塘">
+<meta property="og:description" content="序这套流程主要是为了记录我在学习以及模型训练的过程，以及其中遇见的相关问题 环境 CPU: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz MEM: 384GB 2400 DDR4 GPU: Matrox Electronics Systems Ltd. G200eR2 DISK: 1.1 TB System: Ubuntu 18.04 LTS Python:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/01.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/02.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/03.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/04.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/05.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/06.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/07.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/08.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/09.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/10.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/11.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/12.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/13.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/14.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/15.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/16.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/17.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/18.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/19.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/20.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/21.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/22.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/23.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/24.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/25.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/26.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/27.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/28.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/29.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/30.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/31.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/32.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/33.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/34.jpg">
+<meta property="og:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/35.jpg">
+<meta property="article:published_time" content="2018-11-27T05:45:48.000Z">
+<meta property="article:modified_time" content="2020-08-09T08:05:48.984Z">
+<meta property="article:author" content="飞木鱼">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Tensorflow">
+<meta property="article:tag" content="Conda">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://liufengyu.cn/posts/tensorflow-object-detection/01.jpg">
+
+<link rel="canonical" href="https://liufengyu.cn/posts/tensorflow-object-detection.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用Tensorflow进行物品预测 | 飞鱼塘</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">飞鱼塘</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">飞木鱼的个人博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">16</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">1</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://liufengyu.cn/posts/tensorflow-object-detection.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="飞木鱼">
+      <meta itemprop="description" content="整理一些值得留意的文章">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="飞鱼塘">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Tensorflow进行物品预测
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-27 13:45:48" itemprop="dateCreated datePublished" datetime="2018-11-27T13:45:48+08:00">2018-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-09 16:05:48" itemprop="dateModified" datetime="2020-08-09T16:05:48+08:00">2020-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%99%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">教程</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/posts/tensorflow-object-detection.html#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="/posts/tensorflow-object-detection.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="序"><a href="#序" class="headerlink" title="序"></a>序</h1><p>这套流程主要是为了记录我在学习以及模型训练的过程，以及其中遇见的相关问题</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>CPU: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz</li>
+<li>MEM: 384GB 2400 DDR4</li>
+<li>GPU: Matrox Electronics Systems Ltd. G200eR2</li>
+<li>DISK: 1.1 TB</li>
+<li>System: Ubuntu 18.04 LTS</li>
+<li>Python: 3.6.7</li>
+<li>TensorFlow: 1.12.0</li>
+</ul>
+<p>因为GPU并不是NVIDIA，所以不支持CUDA加速，目前只能使用CPU进行Tensorflow学习，在10月20日，Python版本升级到了3.7，然而到现在(11月28日)，Tensorflow还只支持3.6，故Python版本我们选择了3.6.7，也就是Python 3.6的最后一个版本</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>1.安装Python<br>2.编译并安装Tensorflow以及相关依赖<br>3.安装Tensorflow Model<br>4.使用labelImg进行图片标注<br>5.修改Model代码，生成trainval.txt，将图片及标注文件转换成TFRecord<br>6.下载一套COCO数据集，并更改pipeline.config<br>7.进行40000次的模型训练，生成ckpt文件<br>8.将ckpt转换成GRAPH的pb冻结图<br>9.使用pb冻结图进行物品图片预测  </p>
+<h1 id="Miniconda"><a href="#Miniconda" class="headerlink" title="Miniconda"></a>Miniconda</h1><p>conda和virtualenv一样，可用于Python项目做多版本环境创建与切换的，也就是在同一个环境中，可以存在几个不同python版本或者不同requirement的虚拟环境，在安装依赖更新包都十分方便，anaconda太大了，我也不需要那么多的包，所以我这里使用的是Miniconda</p>
+<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>首先我们需要下载Miniconda，可以<span class="exturl" data-url="aHR0cHM6Ly9jb25kYS5pby9taW5pY29uZGEuaHRtbA==">点击这里<i class="fa fa-external-link-alt"></i></span>，进入Miniconda的官网</p>
+<p><img data-src="tensorflow-object-detection/01.jpg" alt="Miniconda的官网"></p>
+<p>右键复制他的下载地址，通过wget进行下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;repo.anaconda.com&#x2F;miniconda&#x2F;Miniconda3-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+
+<p>等待进度条走完后完成下载</p>
+<p><img data-src="tensorflow-object-detection/02.jpg" alt="Miniconda下载"></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>现在完毕后我们使用bash命令运行这个sh文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash Miniconda3-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+
+<p>按下回车，查看Licenses，并输入yes进行下一步安装</p>
+<p><img data-src="tensorflow-object-detection/03.jpg" alt="Miniconda安装"></p>
+<p>下一步输入安装路径，我这里是安装到了<code>/opt/miniconda3</code>这个目录下</p>
+<p><img data-src="tensorflow-object-detection/04.jpg" alt="Miniconda环境变量"></p>
+<p>经过解包后，会提示你是否添加环境变量，这里我们选择yes，进行添加环境变量</p>
+<p>最后完成环境Miniconda的安装</p>
+<p><img data-src="tensorflow-object-detection/05.jpg" alt="Miniconda环境变量查看"></p>
+<p>我们可以通过下面的命令查看环境变量是否添加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail .bashrc</span><br></pre></td></tr></table></figure>
+
+<p>添加完环境变量后，我们需要用<code>source</code>更新一下，才能使环境变量生效</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source .bashrc</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="降级"><a href="#降级" class="headerlink" title="降级"></a>降级</h3><p>因为Tensorflow现在只支持3.6版本的Python，然而我们下载的是最新版本的Miniconda，里面预装的是3.7最新版本的，所有我们需要进行降级，将python切换到3.6.7</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install python&#x3D;3.6.7</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/06.jpg" alt="Python降级确认"></p>
+<p>经过解析环境后<code>Solving environment</code>后，我们选择yes，进行降级操作</p>
+<p><img data-src="tensorflow-object-detection/07.jpg" alt="Python降级"></p>
+<p>经过一段时间的等待，我们就成功的将Python版本降到了3.6.7</p>
+<p>之后运行下面的命令 安装必要的包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install numpy keras-preprocessing </span><br></pre></td></tr></table></figure>
+
+<h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><p>可以使用下面的命令进行conda升级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda update conda</span><br></pre></td></tr></table></figure>
+
+<p>可以使用下面的命令进行当前所有包进行升级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda update --all</span><br></pre></td></tr></table></figure>
+
+<h3 id="清理"><a href="#清理" class="headerlink" title="清理"></a>清理</h3><p>conda长时间使用后，体积会很大，可以使用下面命令将已经下载包进行清理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda clean -a -y</span><br></pre></td></tr></table></figure>
+
+<h2 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h2><p>如果需要需要卸载conda，可以用下面的命令将相应位置的Miniconda目录直接删除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf &#x2F;opt&#x2F;miniconda3&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>然后使用下面的命令，编辑环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi ~&#x2F;.bashrc</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/08.jpg" alt="Miniconda环境变量"></p>
+<p>将环境变量中的关于conda的内容直接删除即可</p>
+<h1 id="Tensorflow"><a href="#Tensorflow" class="headerlink" title="Tensorflow"></a>Tensorflow</h1><p>Tensorflow目前分2个安装方法</p>
+<ul>
+<li>CPU版</li>
+<li>GPU版</li>
+</ul>
+<p>除了通常的算术和逻辑，现代CPU提供了许多低级指令，称为扩展，例如， SSE2，SSE4，AVX等来自维基百科：</p>
+<blockquote>
+<p>高级矢量扩展（AVX）是英特尔在2008年3月提出的英特尔和AMD微处理器的x86指令集体系结构的扩展，英特尔首先通过Sandy Bridge处理器在2011年第一季度推出，随后由AMD推出Bulldozer处理器在2011年第三季度.AVX提供了新功能，新指令和新编码方案。<br>特别是，AVX引入了融合乘法累加（FMA）操作，加速了线性代数计算，即点积，矩阵乘法，卷积等。几乎所有机器学习训练都涉及大量这些操作，因此将会支持AVX和FMA的CPU（最高达300％）更快。该警告指出您的CPU确实支持AVX（hooray！）。</p>
+</blockquote>
+<p>在此强调一下：</p>
+<blockquote>
+<p>这只限于CPU。如果你有一个GPU，你不应该关心AVX的支持，因为大多数昂贵的操作将被分派到一个GPU设备上（除非明确地设置）。在这种情况下，您可以简单地忽略此警告。</p>
+</blockquote>
+<p>那为什么会出现这种警告呢？</p>
+<blockquote>
+<p>由于tensorflow默认分布是在没有CPU扩展的情况下构建的，例如SSE4.1，SSE4.2，AVX，AVX2，FMA等。默认版本（来自pip install tensorflow的版本）旨在与尽可能多的CPU兼容。另一个观点是，即使使用这些扩展名，CPU的速度也要比GPU慢很多，并且期望在GPU上执行中型和大型机器学习培训。</p>
+</blockquote>
+<p>我们机器没有GPU能够使用，为了尽可能多地利用CPU，且我们的CPU支持AVX，AVX2，为了更好效率，我们使用Bazel重新构建Tensorflow，不仅在以后的使用中，消除AVX等警报，还可以改善Tensorflow的性能</p>
+<p>可以根据个人需求选择是否编译，也可以直接安装发行版本的Tensorflow</p>
+<h2 id="JDK"><a href="#JDK" class="headerlink" title="JDK"></a>JDK</h2><p>安装Bazel，需要Java JDK1.8或更高版本的支持，所以我们的第一项工作就是安装JDK</p>
+<p>关于JDK的安装教程，可以<a href="/posts/jdk-install.html">点击这里</a>查看。</p>
+<h2 id="Bazel"><a href="#Bazel" class="headerlink" title="Bazel"></a>Bazel</h2><h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><p>首先运行下面的代码，安装Bazel相关依赖，因为我们已经安装过python就不需要安装了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install pkg-config zip g++ zlib1g-dev unzip</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><p><img data-src="tensorflow-object-detection/09.jpg" alt="Bazel Releases下载"></p>
+<p>请<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2JhemVsYnVpbGQvYmF6ZWwvcmVsZWFzZXM=">点击这里<i class="fa fa-external-link-alt"></i></span>打开Bazel Releases下载页面，选择相应版本进行下载</p>
+<p>然后运行下面的命令，给sh文件加权限并运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod +x bazel-0.19.2-installer-linux-x86_64.sh</span><br><span class="line">.&#x2F;bazel-0.19.2-installer-linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/10.jpg" alt="Bazel安装成功"></p>
+<p>加载完毕后，看到Bazel is now installed!标明Bazel已安装成功</p>
+<h2 id="编译Tensorflow"><a href="#编译Tensorflow" class="headerlink" title="编译Tensorflow"></a>编译Tensorflow</h2><p>首先我们先用git把Tensorflow的源码下载下来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;tensorflow&#x2F;tensorflow.git</span><br></pre></td></tr></table></figure>
+
+<p>现在完毕后，我们需要运行configure,做一些必要的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd tensorflow</span><br><span class="line">.&#x2F;configure</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/11.jpg" alt="Tensorflow configure"></p>
+<p>接下来，配置系统会给出各种询问，以确认编译时的配置参数，请根据个人情况配置参数，我这里全部选择的n，其他的为默认选项</p>
+<p>在配置完Bazel的编译选项之后，接下来就可以使用如下指令编译TensorFlow的源代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel build --config&#x3D;opt &#x2F;&#x2F;tensorflow&#x2F;tools&#x2F;pip_package:build_pip_package</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/12.jpg" alt="Tensorflow编译"></p>
+<p>这个时候，我们就可以去喝喝水，休息一会，等待编译完毕即可</p>
+<p><img data-src="tensorflow-object-detection/13.jpg" alt="Tensorflow编译成功"></p>
+<p>半个小时后，当我们看到这个提示，就标明tensorflow已经编译成功，在临时文件夹中生成了一堆binary，当前目录下也有软连接，可以直接运行下面的命令，生成whl文件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bazel-bin&#x2F;tensorflow&#x2F;tools&#x2F;pip_package&#x2F;build_pip_package &#x2F;tmp&#x2F;tensorflow_pkg</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/14.jpg" alt="生成whl"></p>
+<p>成功生成whl文件</p>
+<h2 id="安装Tensorflow"><a href="#安装Tensorflow" class="headerlink" title="安装Tensorflow"></a>安装Tensorflow</h2><p>接下来运行下面的命令，直接安装生成的whl</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install &#x2F;tmp&#x2F;tensorflow_pkg&#x2F;tensorflow-1.12.0rc0-cp36-cp36m-linux_x86_64.whl</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/15.jpg" alt="生成whl"></p>
+<p>在经过相关依赖安装之后，提示安装成功</p>
+<p>接下来我们可以跑一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">python</span><br><span class="line">import tensorflow as tf</span><br><span class="line">a &#x3D; tf.constant(2)</span><br><span class="line">b &#x3D; tf.constant(3)</span><br><span class="line">with tf.Session() as sess:</span><br><span class="line">    print(&quot;Addition with constants: %i&quot; % sess.run(a+b))</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/16.jpg" alt="Tensorflow例子"></p>
+<p>如图所示，可以得到结果，则说明Tensorflow已成功安装了</p>
+<h1 id="Tensorflow-Object-Detection-API"><a href="#Tensorflow-Object-Detection-API" class="headerlink" title="Tensorflow Object Detection API"></a>Tensorflow Object Detection API</h1><p>Tensorflow Object Detection API可实现基于给定模型检测图像中的特定目标，是典型的深度学习在计算机视觉中的应用</p>
+<p>包含在Tensorflow Model中</p>
+<p>Tensorflow旧版本自带model，然而新版本已经没有了，就需要我们自己单独下载</p>
+<h2 id="下载-1"><a href="#下载-1" class="headerlink" title="下载"></a>下载</h2><p>首先运行下面的命令，安装Tensorflow Object Detection API的依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install Cython contextlib2 pillow lxml jupyter matplotlib</span><br></pre></td></tr></table></figure>
+<p>虽然都在本次教程中，都不会全用上，但是以后总会用找到了</p>
+<p>使用下面的命令，从Tensorflow models下载最新的文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;tensorflow&#x2F;models.git</span><br></pre></td></tr></table></figure>
+<p>如果网络不太好，就多clone几次，总会成功的</p>
+<h2 id="COCO-API-installation"><a href="#COCO-API-installation" class="headerlink" title="COCO API installation"></a>COCO API installation</h2><p>我们需要使用COCO预处理数据集，需要下载cocoapi，使用下面命令完成COCO API的安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;cocodataset&#x2F;cocoapi.git</span><br><span class="line">cd cocoapi&#x2F;PythonAPI</span><br><span class="line">make</span><br><span class="line">cp -r pycocotools &lt;path_to_tensorflow&gt;&#x2F;models&#x2F;research&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Protobuf编译器安装和使用"><a href="#Protobuf编译器安装和使用" class="headerlink" title="Protobuf编译器安装和使用"></a>Protobuf编译器安装和使用</h2><p>Tensorflow对象检测API使用Protobufs配置模型和训练参数。</p>
+<p>在使用框架之前，必须编译Protobuf库。</p>
+<p><img data-src="tensorflow-object-detection/17.jpg" alt="Protobuf Releases下载"></p>
+<p>首先<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3Byb3RvY29sYnVmZmVycy9wcm90b2J1Zi9yZWxlYXNlcw==">点击这里<i class="fa fa-external-link-alt"></i></span>Protobuf Releases下载页面，选择相应版本进行下载</p>
+<p>然后使用下面的命令解压zip的包到存储的目录下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip -d &#x2F;opt&#x2F;protoc protoc-3.6.1-linux-x86_64.zip</span><br></pre></td></tr></table></figure>
+
+<p>并将下面的信息添加至环境变量到.bashrc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH&#x3D;&quot;&#x2F;opt&#x2F;protoc&#x2F;bin:$PATH&quot;</span><br></pre></td></tr></table></figure>
+
+<p>添加完毕并source更新环境变量后，运行以下命令来编译Protobuf库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;opt&#x2F;models&#x2F;research&#x2F;</span><br><span class="line">protoc object_detection&#x2F;protos&#x2F;*.proto --python_out&#x3D;.</span><br></pre></td></tr></table></figure>
+
+<h2 id="将库添加到PYTHONPATH"><a href="#将库添加到PYTHONPATH" class="headerlink" title="将库添加到PYTHONPATH"></a>将库添加到PYTHONPATH</h2><p>在本地运行时，models/research/和slim目录应该附加到PYTHONPATH。这可以通过从tensorflow/models/research/运行以下命令来完成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PYTHONPATH&#x3D;$PYTHONPATH:&#96;pwd&#96;:&#96;pwd&#96;&#x2F;slim</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此命令需要从您启动的每个新终端运行。如果您希望避免手动运行，可以将其作为新行添加到~/.bashrc文件的末尾，将<code>pwd</code>替换为系统上tensorflow/models/research的绝对路径。</p>
+</blockquote>
+<p>如果你要添加环境变量，可以将下面的内容添加至环境变量并用source更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH&#x3D;&quot;&#x2F;opt&#x2F;models&#x2F;research:&#x2F;opt&#x2F;models&#x2F;research&#x2F;slim:$PATH&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试安装"><a href="#测试安装" class="headerlink" title="测试安装"></a>测试安装</h2><p>您可以测试是否已正确安装Tensorflow对象检测</p>
+<p>通过运行以下命令API：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python object_detection&#x2F;builders&#x2F;model_builder_test.py</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/18.jpg" alt="model_builder_test"></p>
+<p>运行结果如图所示，表明Tensorflow Object Detection API已配置完毕</p>
+<h1 id="LabelImg"><a href="#LabelImg" class="headerlink" title="LabelImg"></a>LabelImg</h1><p>首先需要先要标注图像相应标签，这里可以使用labelImg工具。</p>
+<h2 id="下载-2"><a href="#下载-2" class="headerlink" title="下载"></a>下载</h2><p><img data-src="tensorflow-object-detection/19.jpg" alt="LabelImg Download list"></p>
+<p>请<span class="exturl" data-url="aHR0cHM6Ly90enV0YWxpbi5naXRodWIuaW8vbGFiZWxJbWcv">点击这里<i class="fa fa-external-link-alt"></i></span>打开LabelImg Download list页面，下载合适版本的图片</p>
+<h2 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h2><p><img data-src="tensorflow-object-detection/20.jpg" alt="labelImg.exe"></p>
+<p>解压后，直接双击<code>labelImg.exe</code>文件运行</p>
+<p><img data-src="tensorflow-object-detection/21.jpg" alt="标注"></p>
+<p>对对象物体画框，并记录相应对象的名称，save完成保存xml文件完成标注</p>
+<p>每标注一张样本，即生成一个xml的标注文件</p>
+<p><img data-src="tensorflow-object-detection/22.jpg" alt="单类别图片标注预览图"></p>
+<p>并分类别保存，记得保持图片名称及XML标注文件名称一致，最后同一类别文件夹效果如图所示</p>
+<p><img data-src="tensorflow-object-detection/23.jpg" alt="多类别图片标注预览图"></p>
+<p>一次完成，每个类别保证有200张左右的样本，多个类别下的图片再统一放到一个目录下，效果如图所示</p>
+<h1 id="填写pbtxt文件"><a href="#填写pbtxt文件" class="headerlink" title="填写pbtxt文件"></a>填写pbtxt文件</h1><p><img data-src="tensorflow-object-detection/24.jpg" alt="pbtxt文件"></p>
+<p>在图片预测的时候，并不会直接把对象名字反馈回来，所以我们需要一个映射文件pbtxt，进行标签名和数字的转换，格式如图所示</p>
+<p>将自己标记的图片中对象及自己编号按照格式放到一个pbtxt文本中，之后会用得到</p>
+<h1 id="trainval-txt文件生成"><a href="#trainval-txt文件生成" class="headerlink" title="trainval.txt文件生成"></a>trainval.txt文件生成</h1><p>接下来就要进行TFRecord格式文件转换了，使用官方版的Api就可以生成trainval.txt，但是为了方便多个类别的使用，我对代码进行了一些更改，对类别下的样本进行随机，并按4:1的比率生成train.txt和val.txt，以保证总体样本上的随机，以提高数据的准确性</p>
+<p><img data-src="tensorflow-object-detection/25.jpg" alt="trainval生成代码"></p>
+<p>关键代码如图所示</p>
+<p><img data-src="tensorflow-object-detection/26.jpg" alt="trainval"></p>
+<p>最后会生成2个文件内容如图所示</p>
+<h1 id="TFRecord文件生成"><a href="#TFRecord文件生成" class="headerlink" title="TFRecord文件生成"></a>TFRecord文件生成</h1><p>在生成TFRecord的时候，会根据train.txt和val.txt的内容，逐条生成产生train.record和val.record</p>
+<p>我是用的是object_detection/dataset_tools/create_pet_tf_record.py，并进行了一定的更改，对tainval分别处理，进行图片格式转换，都转换成JPEG格式，对mask去除，并将输出record保存为一个</p>
+<p><img data-src="tensorflow-object-detection/27.jpg" alt="图片格式转换"></p>
+<p>图片格式转换代码如图所示</p>
+<p><img data-src="tensorflow-object-detection/28.jpg" alt="record"></p>
+<p>最后生成2个文件，以便进行下一步训练</p>
+<h1 id="预训练模型下载"><a href="#预训练模型下载" class="headerlink" title="预训练模型下载"></a>预训练模型下载</h1><p><img data-src="tensorflow-object-detection/29.jpg" alt="detection_model_zoo"></p>
+<p>Tensorflow Object Detection API提供了很多模型进行下载，可以<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3RlbnNvcmZsb3cvbW9kZWxzL2Jsb2IvbWFzdGVyL3Jlc2VhcmNoL29iamVjdF9kZXRlY3Rpb24vZzNkb2MvZGV0ZWN0aW9uX21vZGVsX3pvby5tZA==">点击这里<i class="fa fa-external-link-alt"></i></span>打开Tensorflow detection model zoo页面，选择想要的模型进行下载</p>
+<p>我选择的是<code>ssd_inception_v2_coco</code>模型下载，下载后将<code>object_detection/samples/configs/ssd_inception_v2_coco.config</code>这里的文件放到解压后的模型下，并修改参数</p>
+<p><img data-src="tensorflow-object-detection/30.jpg" alt="pipeline.config"></p>
+<p>主要是5个地址进行修改，更换成刚刚生成好的tfreord文件地址，和模型下的ckpt地址</p>
+<p>num_examples是val.txt中测试样本的数目</p>
+<p>num_steps是训练步数</p>
+<h1 id="train训练"><a href="#train训练" class="headerlink" title="train训练"></a>train训练</h1><p><img data-src="tensorflow-object-detection/31.jpg" alt="目录结构"></p>
+<p>首先说明我的目录结构如图所示，我直接将<code>object_detection</code>和<code>slim</code>到工程文件夹下了，使用起来更方便</p>
+<p>修改完毕后，我们就可以进行样本训练了</p>
+<p>在早期的版本Tensorflow中，使用<code>train.py</code>进行训练，在<code>object_detection</code>目录下，现在已经搬到<code>object_detection\legacy</code>目录下了，现在还可以使用，使用命令如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">object_detection\legacy\train.py \</span><br><span class="line">    --logtostderr \</span><br><span class="line">    --pipeline_config_path&#x3D;&#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;ssd_inception_v2&#x2F;pipeline.config \</span><br><span class="line">    --train_dir&#x3D;&#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;data&#x2F;model</span><br></pre></td></tr></table></figure>
+
+<p>在新版本的Tensorflow中，都是使用<code>model_main.py</code>进行训练，在<code>object_detection</code>目录下，使用命令如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">object_detection\model_main.py \</span><br><span class="line">    --model_dir&#x3D;&#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;data&#x2F;model \</span><br><span class="line">    --pipeline_config_path&#x3D;&#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;ssd_inception_v2&#x2F;pipeline.config \</span><br><span class="line">    --num_train_steps&#x3D;40000</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>&lt;name_to_project&gt;</code>是我的项目名称</p>
+</blockquote>
+<p><img data-src="tensorflow-object-detection/32.jpg" alt="log"></p>
+<p>在经过漫长的等待(2天)后，日志终于结束打印</p>
+<p><img data-src="tensorflow-object-detection/33.jpg" alt="model"></p>
+<p>我们也可以在输出文件夹<code>data/model</code>中看到相应步数的检查点</p>
+<h1 id="导出推理图"><a href="#导出推理图" class="headerlink" title="导出推理图"></a>导出推理图</h1><p>要在代码中使用模型，需要将检查点文件（model.ckpt-STEP_NUMBER.*）转换为推理图。</p>
+<p>你可以运行下面的代码，将检查点的ckpt文件转换成推理图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python object_detection\export_inference_graph.py \</span><br><span class="line">    --input_type image_tensor \</span><br><span class="line">    --pipeline_config_path &#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;ssd_inception_v2&#x2F;pipeline.config \</span><br><span class="line">    --trained_checkpoint_prefix &#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;data&#x2F;model-bak&#x2F;model.ckpt-20000 \</span><br><span class="line">    --output_directory &#x2F;root&#x2F;&lt;name_to_project&gt;&#x2F;data&#x2F;graph</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="tensorflow-object-detection/34.jpg" alt="graph"></p>
+<p>导出后的文件如图所示，我们使用的就是<code>frozen_inference_graph.pb</code>文件</p>
+<h1 id="测试模型"><a href="#测试模型" class="headerlink" title="测试模型"></a>测试模型</h1><p>如何使用模型呢，我们可以<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3RlbnNvcmZsb3cvbW9kZWxzL2Jsb2IvbWFzdGVyL3Jlc2VhcmNoL29iamVjdF9kZXRlY3Rpb24vb2JqZWN0X2RldGVjdGlvbl90dXRvcmlhbC5pcHluYg==">点击这里<i class="fa fa-external-link-alt"></i></span>，这是Jupyter的运行文件，我们可以将运行代码拷贝到新建的一个python文件中，或者查找相应的转换工具使用</p>
+<p>将<code>PATH_TO_TEST_IMAGES_DIR</code>参数改为自己要测试的图片<br>将<code>PATH_TO_FROZEN_GRAPH</code>参数改为<code>frozen_inference_graph.pb</code>的路径<br>将<code>PATH_TO_LABELS</code>参数改为<code>xxx.pbtxt</code>的路径</p>
+<p><img data-src="tensorflow-object-detection/35.jpg" alt="test"></p>
+<p>然后运行这个python，稍等片刻，我们就看到的预测结果</p>
+<h1 id="附件"><a href="#附件" class="headerlink" title="附件"></a>附件</h1><p>相关链接：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudGVuc29yZmxvdy5vcmcv">Tensorflow官网<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3RlbnNvcmZsb3cvbW9kZWxzL2Jsb2IvbWFzdGVyL3Jlc2VhcmNoL29iamVjdF9kZXRlY3Rpb24vZzNkb2MvaW5zdGFsbGF0aW9uLm1k">Tensorflow models installation<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2hxODY5MzczNzUvYXJ0aWNsZS9kZXRhaWxzLzc5Njk2MDIz">警告：Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cDovL3d3dy5oYW5rY3MuY29tL21sL2NvbXBpbGUtYW5kLWluc3RhbGwtdGVuc29yZmxvdy1mcm9tLXNvdXJjZS5odG1s">从源码编译安装TensorFlow<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2F3ZWRjdmcvYXJ0aWNsZS9kZXRhaWxzLzc4MTU4MDQ0">TensorFlow安装以及models示例验证<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3h1bmFuMDAzL2FydGljbGUvZGV0YWlscy83ODcyMDE4OQ==">目标检测标注工具labelImg使用方法<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>飞木鱼
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://liufengyu.cn/posts/tensorflow-object-detection.html" title="使用Tensorflow进行物品预测">https://liufengyu.cn/posts/tensorflow-object-detection.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+              <a href="/tags/tensorflow/" rel="tag"><i class="fa fa-tag"></i> Tensorflow</a>
+              <a href="/tags/conda/" rel="tag"><i class="fa fa-tag"></i> Conda</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/jdk-install.html" rel="prev" title="JDK安装指南">
+      <i class="fa fa-chevron-left"></i> JDK安装指南
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/windows-spark.html" rel="next" title="如何在Windows上安装配置Spark">
+      如何在Windows上安装配置Spark <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%8F"><span class="nav-number">1.</span> <span class="nav-text">序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Miniconda"><span class="nav-number">2.</span> <span class="nav-text">Miniconda</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%8D%E7%BA%A7"><span class="nav-number">2.3.1.</span> <span class="nav-text">降级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0"><span class="nav-number">2.3.2.</span> <span class="nav-text">更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%85%E7%90%86"><span class="nav-number">2.3.3.</span> <span class="nav-text">清理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD"><span class="nav-number">2.4.</span> <span class="nav-text">卸载</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tensorflow"><span class="nav-number">3.</span> <span class="nav-text">Tensorflow</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK"><span class="nav-number">3.1.</span> <span class="nav-text">JDK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bazel"><span class="nav-number">3.2.</span> <span class="nav-text">Bazel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96"><span class="nav-number">3.2.1.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91Tensorflow"><span class="nav-number">3.3.</span> <span class="nav-text">编译Tensorflow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Tensorflow"><span class="nav-number">3.4.</span> <span class="nav-text">安装Tensorflow</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tensorflow-Object-Detection-API"><span class="nav-number">4.</span> <span class="nav-text">Tensorflow Object Detection API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-1"><span class="nav-number">4.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#COCO-API-installation"><span class="nav-number">4.2.</span> <span class="nav-text">COCO API installation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf%E7%BC%96%E8%AF%91%E5%99%A8%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">Protobuf编译器安装和使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E5%BA%93%E6%B7%BB%E5%8A%A0%E5%88%B0PYTHONPATH"><span class="nav-number">4.4.</span> <span class="nav-text">将库添加到PYTHONPATH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E5%AE%89%E8%A3%85"><span class="nav-number">4.5.</span> <span class="nav-text">测试安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LabelImg"><span class="nav-number">5.</span> <span class="nav-text">LabelImg</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-2"><span class="nav-number">5.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-1"><span class="nav-number">5.2.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A1%AB%E5%86%99pbtxt%E6%96%87%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">填写pbtxt文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#trainval-txt%E6%96%87%E4%BB%B6%E7%94%9F%E6%88%90"><span class="nav-number">7.</span> <span class="nav-text">trainval.txt文件生成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TFRecord%E6%96%87%E4%BB%B6%E7%94%9F%E6%88%90"><span class="nav-number">8.</span> <span class="nav-text">TFRecord文件生成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B%E4%B8%8B%E8%BD%BD"><span class="nav-number">9.</span> <span class="nav-text">预训练模型下载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#train%E8%AE%AD%E7%BB%83"><span class="nav-number">10.</span> <span class="nav-text">train训练</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%BC%E5%87%BA%E6%8E%A8%E7%90%86%E5%9B%BE"><span class="nav-number">11.</span> <span class="nav-text">导出推理图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">12.</span> <span class="nav-text">测试模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E4%BB%B6"><span class="nav-number">13.</span> <span class="nav-text">附件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="飞木鱼"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">飞木鱼</p>
+  <div class="site-description" itemprop="description">整理一些值得留意的文章</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2Z3Zm1pYW8=" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fwfmiao"><i class="fab fa-github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOmxpdS1mZW5neXVAb3V0bG9vay5jb20=" title="E-Mail → mailto:liu-fengyu@outlook.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</span>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tLw==" title="https:&#x2F;&#x2F;github.com&#x2F;">Github</span>
+        </li>
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly93d3d3LmJpbGliaWxpLmNvbS8=" title="https:&#x2F;&#x2F;wwww.bilibili.com&#x2F;">Bilibili</span>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">飞木鱼</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">92k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:24</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+  <script data-pjax>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+<script data-pjax>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lfyfzy.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://liufengyu.cn/posts/tensorflow-object-detection.html";
+    this.page.identifier = "/posts/tensorflow-object-detection.html";
+    this.page.title = "使用Tensorflow进行物品预测";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://lfyfzy.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+    </div>
+</body>
+</html>
