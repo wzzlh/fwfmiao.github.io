@@ -34,13 +34,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
       - name: Deploy
-        id: deploy
-        uses: sma11black/hexo-action@v1.0.2
-        with:
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
-          user_name: "FWF MIAO"
-          user_email: "liu-fengyu@outlook.com"
-          commit_msg: ${{ github.event.head_commit.message }}
+        run: |
+          cd public
+          git init
+          git config user.name "${{ secrets.GIT_USER_NAME }}"
+          git config user.email "${{ secrets.GIT_USER_EMAIL }}"
+          git add .
+          git commit -m "${{ github.event.head_commit.message }}"
+          git push -f "https://${{ secrets.DEPLOY_KEY }}@${{ secrets.GIT_URL }}" master:master
       - name: Get the output
         run: |
           echo "${{ steps.deploy.outputs.notify }}"
