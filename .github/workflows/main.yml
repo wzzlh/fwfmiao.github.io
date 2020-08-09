@@ -33,15 +33,13 @@ jobs:
           rm -f pnpm-lock.yaml
       - name: Install Dependencies
         run: pnpm install
+      - name: Build
+        run: pnpm build
       - name: Deploy
         run: |
           cd public
           git init
           git config user.name "${{ secrets.GIT_USER_NAME }}"
           git config user.email "${{ secrets.GIT_USER_EMAIL }}"
-          git add .
-          git commit -m "${{ github.event.head_commit.message }}"
-          git push -f "https://${{ secrets.DEPLOY_KEY }}@${{ secrets.GIT_URL }}" master:master
-      - name: Get the output
-        run: |
-          echo "${{ steps.deploy.outputs.notify }}"
+          git commit -a -m "Update Static Site"
+          git push -f -q "https://${{ secrets.DEPLOY_KEY }}@${{ secrets.GIT_URL }}" master:master
